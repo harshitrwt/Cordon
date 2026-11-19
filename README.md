@@ -62,7 +62,7 @@ Cordon v1.1.0 transitions the project from an offline research prototype into a 
 
 Get started with Cordon in minutes, either as a standalone local engine, a remote Cloud Gateway, or a 1-line npm package.
 
-### 1. Install via npm (Node.js / TypeScript)
+### 1. Install via npm ([cordonguard on npm](https://www.npmjs.com/package/cordonguard))
 
 Add Cordon Guard to your Next.js, Express, or OpenAI application:
 
@@ -213,7 +213,7 @@ Tested using an isolated system prompt containing secret token `CANARY_CORDON_9f
 
 ## 🔧 Developer SDK (`cordonguard`)
 
-The official npm SDK enables developers to integrate Cordon in Node.js, Express, and Next.js applications:
+The official SDK is published on the npm registry as [**cordonguard**](https://www.npmjs.com/package/cordonguard). It enables developers to integrate Cordon in Node.js, Express, and Next.js applications in just 1 line of code:
 
 - **Express.js Middleware**:
   ```typescript
