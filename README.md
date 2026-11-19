@@ -26,13 +26,13 @@
 
 In modern software, instructions and untrusted data share the exact same natural-language channel. An attacker can craft prompts that override developer directives, leak proprietary system instructions or credentials, hijack autonomous tools, or bypass safety alignment (OWASP Top 10 for LLM Applications: **LLM01 Prompt Injection**).
 
-Cordon solves this by combining sub-millisecond de-obfuscation, statistical machine learning, multilingual pattern heuristics, and dense vector semantic search into a **learned weighted decision fusion layer**. When an attack is flagged as `BLOCK`, downstream model inference is completely aborted—guaranteeing **zero token compute waste** and **100% prevention of model data leakage**.
+Cordon solves this by combining sub-millisecond de-obfuscation, statistical machine learning, multilingual pattern heuristics, and dense vector semantic search into a **learned weighted decision fusion layer**. When an attack is flagged as `BLOCK`, downstream model inference is completely aborted, guaranteeing **zero token compute waste** and **100% prevention of model data leakage**.
 
 ---
 
 ## 📖 Table of Contents
 
-- [✨ What's New in v1.1.0](#-whats-new-in-v110)
+- [✨ Version v1.1.0](#-whats-new-in-v110)
 - [🚀 Quick Start](#-quick-start)
 - [🧩 Key Architecture & Features](#-key-architecture--features)
 - [📚 Defense Pipeline Layers](#-defense-pipeline-layers)
@@ -60,7 +60,7 @@ Cordon v1.1.0 transitions the project from an offline research prototype into a 
 
 ## 🚀 Quick Start
 
-Get started with Cordon in minutes—either as a standalone local engine, a remote Cloud Gateway, or a 1-line npm package.
+Get started with Cordon in minutes, either as a standalone local engine, a remote Cloud Gateway, or a 1-line npm package.
 
 ### 1. Install via npm (Node.js / TypeScript)
 
@@ -248,7 +248,7 @@ Cordon is served as an asynchronous REST microservice deployed on Google Cloud R
 
 - **HMAC Authentication**: Secure API key verification without storing readable secrets.
 - **Tiered Quotas**: Free Community Tier (5,000 monthly requests) and Pro Enterprise Tier (100,000 requests + live threat upserts).
-- **Zero-PII Audit Telemetry**: Raw user prompts are cryptographically hashed using SHA-256. Audit records store only the hash prefix, string length, latency, and verdict—guaranteeing GDPR and enterprise privacy compliance.
+- **Zero-PII Audit Telemetry**: Raw user prompts are cryptographically hashed using SHA-256. Audit records store only the hash prefix, string length, latency, and verdict, guaranteeing GDPR and enterprise privacy compliance.
 
 ---
 
