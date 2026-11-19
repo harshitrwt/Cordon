@@ -23,7 +23,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Environment
+# Environment & Secrets
 .env
 *.env
 .env.*
@@ -40,13 +40,36 @@ venv.bak/
 .idea/
 .DS_Store
 Thumbs.db
+*.swp
+*~
 
 # PyTest & Coverage
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Large Datasets & Model Cache
+# Archives & Temporary Artifacts
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+cloud-run-src*.zip
+
+# Scratch Scripts & Exploratory Notes
+scratch/
+design.md
+researchpprs.md
+report_images/
+Cordon_Guard_Progress_Presentation_*.pptx
+make_presentation.py
+generate_slidespeak_presentation.py
+slidespeak.html
+extracted_msit_logo.png
+
+# Accidental Nested Clones
+Prompt_injection_Minor_project/
+
+# Large Datasets & Cache
 data/raw/kaggle_mpdd/
 data/raw/*.zip
 data/processed/*.csv
@@ -58,13 +81,14 @@ data/processed/*.csv
 hf_cache/
 wandb/
 
-# Results logs if temporary
+# Results & Logs
 *.log
 
-# Node & SDK Dependencies
+# Node & Frontend / SDK Dependencies
 node_modules/
 **/node_modules/
 package-lock.json
 **/package-lock.json
 .next/
 dist/
+**/dist/
