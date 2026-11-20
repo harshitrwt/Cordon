@@ -78,6 +78,11 @@ export function DashboardClient() {
   const [isTesting, setIsTesting] = useState(false);
   const [sensitivity, setSensitivity] = useState<"strict" | "balanced" | "lenient">("balanced");
   const [tableRows, setTableRows] = useState<LogRow[]>(attackLog);
+  const [stats, setStats] = useState({
+    blocked: usage.blockedThisMonth,
+    reviewed: usage.reviewedThisMonth,
+    used: usage.used,
+  });
 
   useEffect(() => {
     const user = getActiveUser();
@@ -91,11 +96,19 @@ export function DashboardClient() {
         decision: p.decision,
       }));
       setTableRows([...userAudits, ...attackLog]);
+
+      const userBlocked = user.promptHistory.filter((p) => p.decision === "BLOCK").length;
+      const userReviewed = user.promptHistory.filter((p) => p.decision === "REVIEW").length;
+      setStats({
+        blocked: usage.blockedThisMonth + userBlocked,
+        reviewed: usage.reviewedThisMonth + userReviewed,
+        used: usage.used + user.promptHistory.length,
+      });
     }
   }, []);
 
   const limit = usage.freeLimit;
-  const pct = Math.round((usage.used / limit) * 100);
+  const pct = Math.round((stats.used / limit) * 100);
 
   async function handleTestInspection(e: React.FormEvent) {
     e.preventDefault();
@@ -134,6 +147,13 @@ export function DashboardClient() {
         decision,
       };
       setTableRows((prev) => [newRow, ...prev]);
+
+      // Update counters dynamically
+      setStats((prev) => ({
+        blocked: decision === "BLOCK" ? prev.blocked + 1 : prev.blocked,
+        reviewed: decision === "REVIEW" ? prev.reviewed + 1 : prev.reviewed,
+        used: prev.used + 1,
+      }));
     } catch {
       const fallbackResult = {
         decision: "SAFE" as Decision,
@@ -158,6 +178,10 @@ export function DashboardClient() {
         decision: "SAFE",
       };
       setTableRows((prev) => [newRow, ...prev]);
+      setStats((prev) => ({
+        ...prev,
+        used: prev.used + 1,
+      }));
     } finally {
       setIsTesting(false);
     }
@@ -229,7 +253,7 @@ export function DashboardClient() {
               Blocked Injections
             </span>
             <div className="heading-editorial mt-2 text-[32px] text-crimson">
-              {usage.blockedThisMonth}
+              {stats.blocked}
             </div>
             <span className="mt-1 block font-mono text-[11px] text-smoke">
               Threat Score &gt; 0.50 (Auto-quarantined)
@@ -241,7 +265,7 @@ export function DashboardClient() {
               Flagged for Review
             </span>
             <div className="heading-editorial mt-2 text-[32px] text-off-black">
-              {usage.reviewedThisMonth}
+              {stats.reviewed}
             </div>
             <span className="mt-1 block font-mono text-[11px] text-smoke">
               Borderline Ambiguity (0.30 - 0.50)
@@ -267,7 +291,7 @@ export function DashboardClient() {
               />
             </div>
             <div className="mt-2.5 flex items-center justify-between font-mono text-[11px] text-smoke">
-              <span>{usage.used.toLocaleString()} / {limit.toLocaleString()} prompts used</span>
+              <span>{stats.used.toLocaleString()} / {limit.toLocaleString()} prompts used</span>
               <span className="text-[10px] text-emerald-700 font-medium">Fail-open active</span>
             </div>
           </div>
