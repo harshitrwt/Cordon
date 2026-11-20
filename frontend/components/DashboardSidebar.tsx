@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { Logo } from "./Logo";
+import { getActiveUser, clearActiveUser, UserSession } from "../lib/auth";
 
 const links = [
   { href: "/dashboard", label: "Overview" },
@@ -11,6 +13,17 @@ const links = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<UserSession | null>(null);
+
+  useEffect(() => {
+    setUser(getActiveUser());
+  }, []);
+
+  function handleSignOut() {
+    clearActiveUser();
+    router.push("/login");
+  }
 
   return (
     <>
@@ -41,18 +54,37 @@ export function DashboardSidebar() {
           </nav>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <div className="rounded-2xl border border-ash bg-white/70 p-3.5 shadow-sm">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-smoke block">
-              Tier
-            </span>
-            <span className="font-mono text-[13px] text-off-black font-medium">
-              Academic · Free
-            </span>
+        <div className="flex flex-col gap-3">
+          {/* User Profile Card */}
+          <div className="rounded-2xl border border-ash bg-white/80 p-3.5 shadow-sm">
+            <div className="flex items-center gap-2.5">
+              <div className="h-8 w-8 rounded-full bg-off-black text-parchment flex items-center justify-center font-mono text-[12px] font-bold">
+                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-mono text-[12px] font-semibold text-off-black truncate">
+                  {user?.name || "Academic User"}
+                </div>
+                <div className="font-mono text-[10px] text-smoke truncate">
+                  {user?.email || "free-tier@cordon.local"}
+                </div>
+              </div>
+            </div>
+            <div className="mt-2.5 pt-2 border-t border-ash/60 flex items-center justify-between text-[10.5px] font-mono">
+              <span className="text-lake-blue font-medium">Free Tier</span>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="text-smoke hover:text-crimson transition underline underline-offset-2"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
+
           <Link
             href="/"
-            className="font-mono text-[11px] uppercase tracking-wider text-smoke transition hover:text-off-black"
+            className="font-mono text-[11px] uppercase tracking-wider text-smoke transition hover:text-off-black px-1"
           >
             ← Return to site
           </Link>
