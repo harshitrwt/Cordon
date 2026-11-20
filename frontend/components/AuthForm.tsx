@@ -45,7 +45,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
-    if (!isSignup) {
+    if (isSignup) {
+      // User Registration Flow: create new isolated profile with starter defaults
+      registerUser(name, email, password, organization);
+    } else {
       // Normal Login Flow: Authenticate and persist user session
       loginWithEmail(email, password);
     }
@@ -77,6 +80,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     setSubmitting(true);
     setEmail("evaluator@cordon-ai.org");
     setPassword("secure-demo-2026");
+    loginWithEmail("evaluator@cordon-ai.org", "secure-demo-2026");
     setTimeout(() => {
       router.push("/dashboard");
     }, 400);
