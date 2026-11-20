@@ -45,6 +45,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    if (!isSignup) {
+      // Normal Login Flow: Authenticate and persist user session
+      loginWithEmail(email, password);
+    }
     setTimeout(() => {
       router.push("/dashboard");
     }, 450);
