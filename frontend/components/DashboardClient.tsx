@@ -70,16 +70,14 @@ console.log(verdict.decision); // "SAFE" | "REVIEW" | "BLOCK"`,
 };
 
 export function DashboardClient() {
-  const [tier, setTier] = useState<"free" | "pro">("free");
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const tier = "free" as const;
   const [activeTab, setActiveTab] = useState("express_free");
   const [testPrompt, setTestPrompt] = useState("");
   const [testResult, setTestResult] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [sensitivity, setSensitivity] = useState<"strict" | "balanced" | "lenient">("balanced");
-  const [upgradeSuccess, setUpgradeSuccess] = useState(false);
 
-  const limit = tier === "pro" ? usage.proLimit : usage.freeLimit;
+  const limit = usage.freeLimit;
   const pct = Math.round((usage.used / limit) * 100);
 
   async function handleTestInspection(e: React.FormEvent) {
@@ -106,37 +104,8 @@ export function DashboardClient() {
     }
   }
 
-  function handleUpgradeToPro() {
-    setTier("pro");
-    setShowUpgradeModal(false);
-    setUpgradeSuccess(true);
-    setTimeout(() => setUpgradeSuccess(false), 5000);
-  }
-
-  function handleDowngradeToFree() {
-    setTier("free");
-  }
-
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-8 sm:py-10">
-      {/* Toast Alert on Tier Upgrade */}
-      {upgradeSuccess && (
-        <div className="mb-6 rounded-2xl border border-emerald-300 bg-emerald-50 p-4 text-[13px] font-mono text-emerald-900 shadow-sm flex items-center justify-between animate-fade-in">
-          <div className="flex items-center gap-2.5">
-            <span className="text-emerald-600 text-[18px]">✓</span>
-            <span>
-              <strong>Welcome to Pro Production Tier!</strong> Your 100,000 monthly quota and dedicated Qdrant vector cluster are now active.
-            </span>
-          </div>
-          <button
-            onClick={() => setUpgradeSuccess(false)}
-            className="text-emerald-700 hover:text-emerald-900 font-bold px-2"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
       {/* Top Header with Tier Status */}
       <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -162,23 +131,15 @@ export function DashboardClient() {
           </p>
         </div>
 
-        {/* Upgrade / Tier Action Button */}
-        <div className="flex items-center gap-3">
-          {tier === "free" ? (
-            <button
-              onClick={() => setShowUpgradeModal(true)}
-              className="rounded-full bg-gradient-to-r from-lake-blue to-blue-700 px-5 py-2 font-mono text-[12px] uppercase tracking-wider text-white shadow-sm hover:opacity-95 transition flex items-center gap-1.5"
-            >
-              <span>⚡ Upgrade to Pro ($49/mo)</span>
-            </button>
-          ) : (
-            <button
-              onClick={handleDowngradeToFree}
-              className="rounded-full border border-ash bg-white px-4 py-2 font-mono text-[11px] uppercase text-smoke hover:text-off-black transition"
-            >
-              Switch to Free Tier (Demo)
-            </button>
-          )}
+        {/* Tier Action / Status */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div
+            className="rounded-full border border-ash bg-white/70 px-4 py-1.5 font-mono text-[11px] uppercase tracking-wider text-smoke flex items-center gap-2 cursor-not-allowed select-none shadow-xs"
+            title="Dedicated enterprise Qdrant clusters will launch in upcoming releases."
+          >
+            <span className="h-2 w-2 rounded-full bg-amber-400" />
+            <span>Pro Tier · Coming Soon</span>
+          </div>
 
           {/* Sensitivity Selector */}
           <div className="flex items-center gap-2 rounded-xl border border-ash bg-white/70 p-1.5 self-start sm:self-auto">
@@ -248,14 +209,7 @@ export function DashboardClient() {
               </div>
               <div className="mt-2 flex items-center justify-between font-mono text-[11px] text-smoke">
                 <span>{usage.used.toLocaleString()} / {limit.toLocaleString()} prompts</span>
-                {tier === "free" && (
-                  <button
-                    onClick={() => setShowUpgradeModal(true)}
-                    className="text-lake-blue hover:underline font-medium"
-                  >
-                    + Boost
-                  </button>
-                )}
+                <span className="text-[10px] text-smoke uppercase">Free Quota</span>
               </div>
             </div>
           </div>
@@ -382,82 +336,6 @@ export function DashboardClient() {
           </div>
         </div>
       </div>
-
-      {/* Upgrade to Pro Modal */}
-      {showUpgradeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-[500px] rounded-3xl border border-ash bg-parchment p-7 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-ash pb-4">
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-amber-100 p-1 text-amber-800 text-sm">★</span>
-                <h3 className="heading-editorial text-[22px] text-off-black">Upgrade to Pro Tier</h3>
-              </div>
-              <button
-                onClick={() => setShowUpgradeModal(false)}
-                className="font-mono text-[14px] text-smoke hover:text-off-black"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="mt-4 space-y-4">
-              <p className="font-mono text-[13px] text-graphite">
-                Every developer gets the free tier by default (in-memory + 5,000 monthly prompts). Upgrade to unlock enterprise-grade scale:
-              </p>
-
-              <div className="rounded-2xl border border-amber-300 bg-amber-50/60 p-4">
-                <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-[13px] font-bold text-amber-950">Pro Production</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="heading-editorial text-[28px] text-off-black">$49</span>
-                    <span className="font-mono text-[12px] text-smoke">/ month</span>
-                  </div>
-                </div>
-
-                <ul className="mt-3 space-y-2 font-mono text-[12px] text-graphite border-t border-amber-200/60 pt-3">
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-600 font-bold">✓</span>
-                    <strong>100,000 screened prompts</strong> / month (20x Free quota)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-600 font-bold">✓</span>
-                    <strong>Dedicated Qdrant Cloud vector cluster</strong>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-600 font-bold">✓</span>
-                    Custom strict / lenient organizational security rules
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-600 font-bold">✓</span>
-                    Full telemetry CSV audit export &amp; SOC2 readiness
-                  </li>
-                </ul>
-              </div>
-
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleUpgradeToPro}
-                  className="flex-1 rounded-full bg-off-black py-3 font-mono text-[13px] uppercase tracking-wider text-white hover:bg-black transition shadow-md"
-                >
-                  Activate Pro Tier ($49/mo) ▸
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowUpgradeModal(false)}
-                  className="rounded-full border border-ash px-4 py-3 font-mono text-[12px] uppercase text-smoke hover:text-off-black transition"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              <p className="text-center font-mono text-[10.5px] text-smoke">
-                Simulated checkout for demo. Instantly updates your active API key and quota.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
