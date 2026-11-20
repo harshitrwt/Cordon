@@ -1,14 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AttackTable } from "./AttackTable";
 import { attackLog, Decision, LogRow } from "../lib/mockData";
+import { getActiveUser } from "../lib/auth";
 
 export function AttackLogClient() {
   const [filter, setFilter] = useState<"ALL" | Decision>("ALL");
   const [search, setSearch] = useState("");
+  const [allRows, setAllRows] = useState<LogRow[]>(attackLog);
 
-  const filteredRows = attackLog.filter((row: LogRow) => {
+  useEffect(() => {
+    const user = getActiveUser();
+    if (user && user.promptHistory && user.promptHistory.length > 0) {
+      const userAudits: LogRow[] = user.promptHistory.map((p, idx) => ({
+        id: p.id || `audit_usr_${idx}`,
+        time: p.timestamp || "Just now",
+        prompt: p.prompt,
+        attackType: p.decision === "BLOCK" ? "live_override" : p.decision === "REVIEW" ? "ambiguous_roleplay" : "none",
+        riskScore: p.risk_score,
+        decision: p.decision,
+      }));
+      setAllRows([...userAudits, ...attackLog]);
+    }
+  }, []);
+
+  const filteredRows = allRows.filter((row: LogRow) => {
     const matchesFilter = filter === "ALL" || row.decision === filter;
     const matchesSearch =
       search.trim() === "" ||

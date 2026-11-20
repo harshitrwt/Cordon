@@ -77,6 +77,22 @@ export function DashboardClient() {
   const [testResult, setTestResult] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [sensitivity, setSensitivity] = useState<"strict" | "balanced" | "lenient">("balanced");
+  const [tableRows, setTableRows] = useState<LogRow[]>(attackLog);
+
+  useEffect(() => {
+    const user = getActiveUser();
+    if (user && user.promptHistory && user.promptHistory.length > 0) {
+      const userAudits: LogRow[] = user.promptHistory.map((p, idx) => ({
+        id: p.id || `audit_usr_${idx}`,
+        time: p.timestamp || "Just now",
+        prompt: p.prompt,
+        attackType: p.decision === "BLOCK" ? "direct_override" : p.decision === "REVIEW" ? "ambiguous_roleplay" : "none",
+        riskScore: p.risk_score,
+        decision: p.decision,
+      }));
+      setTableRows([...userAudits, ...attackLog]);
+    }
+  }, []);
 
   const limit = usage.freeLimit;
   const pct = Math.round((usage.used / limit) * 100);
@@ -95,18 +111,32 @@ export function DashboardClient() {
       const data = await resp.json();
       setTestResult(data);
 
+      const decision = (data.decision as Decision) || "SAFE";
+      const risk_score = data.risk_score || 0.04;
+
       // Record audit in active user session
       recordAuditForActiveUser({
         prompt: testPrompt,
-        decision: (data.decision as Decision) || "SAFE",
-        risk_score: data.risk_score || 0.04,
+        decision,
+        risk_score,
         latency_ms: data.latency_ms || 11.2,
         sensitivity,
         tier: "free-cloud",
       });
+
+      // Update table live
+      const newRow: LogRow = {
+        id: `usr_test_${Date.now()}`,
+        time: "Just now",
+        prompt: testPrompt,
+        attackType: decision === "BLOCK" ? "live_injection" : decision === "REVIEW" ? "ambiguous_probe" : "none",
+        riskScore: risk_score,
+        decision,
+      };
+      setTableRows((prev) => [newRow, ...prev]);
     } catch {
       const fallbackResult = {
-        decision: "SAFE",
+        decision: "SAFE" as Decision,
         risk_score: 0.05,
         latency_ms: 12.0,
       };
@@ -119,6 +149,15 @@ export function DashboardClient() {
         sensitivity,
         tier: "free-cloud",
       });
+      const newRow: LogRow = {
+        id: `usr_test_${Date.now()}`,
+        time: "Just now",
+        prompt: testPrompt,
+        attackType: "none",
+        riskScore: 0.05,
+        decision: "SAFE",
+      };
+      setTableRows((prev) => [newRow, ...prev]);
     } finally {
       setIsTesting(false);
     }
@@ -330,7 +369,7 @@ export function DashboardClient() {
             </Link>
           </div>
           <div className="overflow-x-auto rounded-2xl border border-ash bg-white/80 p-1 shadow-sm">
-            <AttackTable rows={attackLog.slice(0, 5)} />
+            <AttackTable rows={tableRows.slice(0, 6)} />
           </div>
         </div>
 
