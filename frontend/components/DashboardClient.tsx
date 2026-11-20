@@ -196,14 +196,8 @@ export function DashboardClient() {
             <span className="font-mono text-[11px] uppercase tracking-widest text-smoke">
               AI Firewall &amp; Telemetry
             </span>
-            <span
-              className={`rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${
-                tier === "pro"
-                  ? "bg-amber-100 text-amber-900 border border-amber-300"
-                  : "bg-lake-blue/15 text-lake-blue border border-lake-blue/30"
-              }`}
-            >
-              {tier === "pro" ? "★ Pro Tier Active" : "Free Community Tier"}
+            <span className="rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider bg-lake-blue/15 text-lake-blue border border-lake-blue/30">
+              Free Community Tier
             </span>
           </div>
           <h1 className="heading-editorial mt-1 text-[clamp(1.8rem,3vw,2.4rem)] text-off-black">
