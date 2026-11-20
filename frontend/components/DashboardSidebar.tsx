@@ -8,7 +8,9 @@ import { getActiveUser, clearActiveUser, UserSession } from "../lib/auth";
 
 const links = [
   { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/keys", label: "Get API Key" },
   { href: "/dashboard/logs", label: "Attack Log" },
+  { href: "/dashboard/about", label: "About" },
 ];
 
 export function DashboardSidebar() {
@@ -92,9 +94,23 @@ export function DashboardSidebar() {
       </aside>
 
       {/* Mobile Top Navigation Bar */}
-      <div className="flex w-full items-center justify-between border-b border-ash bg-parchment px-4 py-3 md:hidden">
-        <Logo />
-        <div className="flex items-center gap-2">
+      <div className="flex w-full flex-col border-b border-ash bg-parchment px-4 py-3 md:hidden gap-2.5">
+        <div className="flex items-center justify-between">
+          <Logo />
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[10.5px] text-smoke">
+              {user?.name || "Free Tier"}
+            </span>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="rounded-full border border-ash px-2 py-0.5 font-mono text-[10px] uppercase text-smoke hover:text-crimson"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
           {links.map((l) => {
             const active =
               l.href === "/dashboard"
@@ -104,22 +120,16 @@ export function DashboardSidebar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`rounded-full px-3 py-1 font-mono text-[11px] uppercase tracking-wider ${
+                className={`whitespace-nowrap rounded-full px-3 py-1 font-mono text-[10.5px] uppercase tracking-wider transition ${
                   active
                     ? "bg-off-black text-parchment"
-                    : "text-graphite bg-parchment/80 border border-ash"
+                    : "text-graphite bg-white/70 border border-ash/70 hover:bg-white"
                 }`}
               >
                 {l.label}
               </Link>
             );
           })}
-          <Link
-            href="/"
-            className="rounded-full border border-ash px-2.5 py-1 font-mono text-[10px] uppercase text-smoke"
-          >
-            Exit
-          </Link>
         </div>
       </div>
     </>
