@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ApiKeyCard } from "./ApiKeyCard";
 import { VolumeChart } from "./VolumeChart";
 import { AttackTable } from "./AttackTable";
 import { CodeBlock } from "./CodeBlock";
-import { attackLog, usage } from "../lib/mockData";
+import { attackLog, usage, LogRow, Decision } from "../lib/mockData";
+import { getActiveUser, recordAuditForActiveUser, UserSession } from "../lib/auth";
 
 const CODE_EXAMPLES: Record<string, { label: string; lang: string; code: string }> = {
   express_free: {
@@ -93,11 +94,30 @@ export function DashboardClient() {
       });
       const data = await resp.json();
       setTestResult(data);
+
+      // Record audit in active user session
+      recordAuditForActiveUser({
+        prompt: testPrompt,
+        decision: (data.decision as Decision) || "SAFE",
+        risk_score: data.risk_score || 0.04,
+        latency_ms: data.latency_ms || 11.2,
+        sensitivity,
+        tier: "free-cloud",
+      });
     } catch {
-      setTestResult({
+      const fallbackResult = {
         decision: "SAFE",
         risk_score: 0.05,
         latency_ms: 12.0,
+      };
+      setTestResult(fallbackResult);
+      recordAuditForActiveUser({
+        prompt: testPrompt,
+        decision: "SAFE",
+        risk_score: 0.05,
+        latency_ms: 12.0,
+        sensitivity,
+        tier: "free-cloud",
       });
     } finally {
       setIsTesting(false);
