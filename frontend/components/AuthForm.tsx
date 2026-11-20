@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { loginWithEmail, registerUser, loginWithGoogle } from "../lib/auth";
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
@@ -16,6 +17,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [rememberMe, setRememberMe] = useState(true);
   const [agreeTerms, setAgreeTerms] = useState(true);
   const [forgotSent, setForgotSent] = useState(false);
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [googleAccountChoice, setGoogleAccountChoice] = useState({
+    name: "Alex Rivera",
+    email: "alex.rivera@gmail.com",
+  });
 
   const isSignup = mode === "signup";
 
@@ -44,11 +50,23 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }, 450);
   }
 
-  function handleSocialLogin(provider: string) {
-    setSocialLoading(provider);
+  function handleGoogleLogin() {
+    setSocialLoading("google");
+    setTimeout(() => {
+      setShowGoogleModal(true);
+      setSocialLoading(null);
+    }, 300);
+  }
+
+  function confirmGoogleSignIn(emailChoice?: string, nameChoice?: string) {
+    const finalEmail = emailChoice || googleAccountChoice.email;
+    const finalName = nameChoice || googleAccountChoice.name;
+    setSubmitting(true);
+    setShowGoogleModal(false);
+    loginWithGoogle(finalEmail, finalName);
     setTimeout(() => {
       router.push("/dashboard");
-    }, 550);
+    }, 400);
   }
 
   function handleDemoAccess() {
@@ -325,6 +343,114 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           </>
         )}
       </p>
+      {/* Google Authentication Dialog Modal */}
+      {showGoogleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in font-sans">
+          <div className="w-full max-w-[420px] rounded-3xl border border-ash bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-ash/70">
+              <div className="flex items-center gap-2.5">
+                <svg className="h-5 w-5" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25A11.95 11.95 0 000 12c0 1.92.45 3.74 1.25 5.42l4.03-3.15z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                  />
+                </svg>
+                <span className="font-medium text-[15px] text-off-black">Sign in with Google</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowGoogleModal(false)}
+                className="text-smoke hover:text-off-black text-sm px-1.5 py-0.5 rounded-full"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="mt-4 text-[13px] text-graphite">
+              Choose an account to continue to <strong>Cordon AI Security Gateway</strong>:
+            </p>
+
+            <div className="mt-4 space-y-2">
+              <button
+                type="button"
+                onClick={() => confirmGoogleSignIn("alex.rivera@gmail.com", "Alex Rivera")}
+                className="w-full flex items-center justify-between p-3 rounded-2xl border border-ash hover:border-lake-blue hover:bg-lake-blue/5 transition text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full bg-blue-600 text-white font-medium flex items-center justify-center text-sm shadow-sm">
+                    A
+                  </div>
+                  <div>
+                    <div className="text-[13px] font-semibold text-off-black">Alex Rivera</div>
+                    <div className="text-[11px] text-smoke font-mono">alex.rivera@gmail.com</div>
+                  </div>
+                </div>
+                <span className="text-xs text-smoke font-mono">Primary</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => confirmGoogleSignIn("researcher.mit@gmail.com", "Dr. Elena Rostova")}
+                className="w-full flex items-center justify-between p-3 rounded-2xl border border-ash hover:border-lake-blue hover:bg-lake-blue/5 transition text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full bg-emerald-600 text-white font-medium flex items-center justify-center text-sm shadow-sm">
+                    E
+                  </div>
+                  <div>
+                    <div className="text-[13px] font-semibold text-off-black">Dr. Elena Rostova</div>
+                    <div className="text-[11px] text-smoke font-mono">researcher.mit@gmail.com</div>
+                  </div>
+                </div>
+                <span className="text-xs text-smoke font-mono">Academic</span>
+              </button>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-ash/60">
+              <label className="block text-[11px] uppercase font-mono text-smoke mb-1.5">
+                Or enter another Google email
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="your.name@gmail.com"
+                  value={googleAccountChoice.email}
+                  onChange={(e) =>
+                    setGoogleAccountChoice({
+                      name: e.target.value.split("@")[0] || "Google User",
+                      email: e.target.value,
+                    })
+                  }
+                  className="flex-1 rounded-xl border border-ash px-3 py-2 text-[12px] font-mono text-off-black outline-none focus:border-lake-blue"
+                />
+                <button
+                  type="button"
+                  onClick={() => confirmGoogleSignIn()}
+                  className="rounded-xl bg-off-black text-parchment px-3 py-2 text-[11px] font-mono uppercase tracking-wider hover:bg-black transition"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+
+            <p className="mt-4 text-center text-[11px] text-smoke">
+              To continue, Google will share your name and email with Cordon.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
