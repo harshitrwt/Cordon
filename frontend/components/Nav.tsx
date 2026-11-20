@@ -38,15 +38,15 @@ export function Nav() {
         <div className="flex items-center gap-2.5 sm:gap-3">
           <Link
             href="/login"
-            className="rounded-full bg-off-black px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-wider text-parchment transition hover:bg-black sm:px-4 sm:py-2"
+            className="rounded-full border border-ash/80 bg-white/60 px-4 py-1.5 font-mono text-[11px] uppercase tracking-wider text-off-black transition hover:bg-white hover:border-off-black sm:px-5 sm:py-2"
           >
-            Login &gt;
+            Sign In
           </Link>
           <Link
-            href="/dashboard"
-            className="rounded-full bg-lake-blue px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-wider text-white transition hover:bg-[#2045a8] shadow-[0_2px_10px_rgba(43,89,209,0.3)] sm:px-4 sm:py-2"
+            href="/signup"
+            className="rounded-full bg-off-black px-4 py-1.5 font-mono text-[11px] uppercase tracking-wider text-parchment transition hover:bg-black shadow-sm sm:px-5 sm:py-2"
           >
-            Get API Key &gt;
+            Sign Up
           </Link>
         </div>
       </header>
